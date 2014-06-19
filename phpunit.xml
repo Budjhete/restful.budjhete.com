@@ -1,0 +1,8 @@
+<phpunit bootstrap="modules/unittest/bootstrap.php" 
+         colors="true">
+    <testsuites>
+        <testsuite name="Budjhete RESTful tests">
+            <directory>application/tests</directory>
+        </testsuite>
+    </testsuites>
+</phpunit>
