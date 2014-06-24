@@ -113,6 +113,28 @@ List all products
 
 ## Invoices
 
+List all invoices
+
+```GET /company/<name>/invoices```
+
+## Filtering
+
+When fetching multiple models, it is possible to filter results using the HTTP
+query.
+
+Filter with the WHERE clause
+
+```json
+{
+    where: [
+        [column, operator, value]       
+    ],
+    order_by: column,
+    order_by: [column1, column1],
+    group_by: column
+}
+```
+
 ## Status
 
 The api will respond using HTTP status code. A complete list of status code may
@@ -121,13 +143,13 @@ be found [here on Wikipedia](http://en.wikipedia.org/wiki/List_of_HTTP_status_co
 Response will have a HTTP status and possibly a body and headers.
 
 | Event | Status description | Status | Body | Headers |
-| ----- | ------------------ | ------ | ---- | ------- |
-| Fetched a model | Ok | 200 | <data> | |
-| Updated a model | Ok | 200 | null | |
-| Successfully created a model | Created | 201 | <id> | |
-| Successfully deleted a model | No Content | 204 | null | |
-| Unauthenticated access | Unauthorized | 401 | null | WWW-Authenticate: Basic |
-| Submitting invalid or missing data | Forbidden | 403 | { <field>: <list of error message> } | |
-| Accessing an unexisting model | Not Found | 404 | null | |
-| Accessing an unexisting/unimplemented endpoint | Not Implemented | 501 | null | |
+| ----- | ------------------ | :----: | :--: | ------- |
+| Fetched a model | Ok | 200 | ```{ field: value }``` | |
+| Updated a model | Ok | 200 | ```null``` | |
+| Successfully created a model | Created | 201 | ```id``` | |
+| Successfully deleted a model | No Content | 204 | ```null``` | |
+| Unauthenticated access | Unauthorized | 401 | ```null``` | WWW-Authenticate: Basic |
+| Submitting invalid or missing data | Forbidden | 403 | ```{ field: [message] }``` | |
+| Accessing an unexisting model | Not Found | 404 | ```null``` | |
+| Accessing an unexisting/unimplemented endpoint | Not Implemented | 501 | ```null``` | |
 
