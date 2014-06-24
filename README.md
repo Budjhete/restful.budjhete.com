@@ -28,6 +28,7 @@ At first, if not authenticated, the api will respond you with a ```401``` status
 code and will provide the appropriate header ```WWW-Authenticate```
 
 ```http
+GET /
 WWW-Authenticate: Basic ...
 ```
 
@@ -37,6 +38,7 @@ either be Basic or Digest.
 In case of a Basic authentication, 
 
 ```http
+GET /
 Authorization: Basic base64(username + ':' + password)
 Authorization: Basic base64(api_key)
 ```
@@ -44,6 +46,7 @@ Authorization: Basic base64(api_key)
 In case of a Digest authentication
 
 ```http
+GET /
 Authorization: Basic base64(username + ':' + md5(password))
 Authorization: Basic base64(md5(api_key))
 ```
