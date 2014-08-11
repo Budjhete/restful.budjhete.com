@@ -23,6 +23,11 @@ class RESTfulTest extends Unittest_TestCase {
 			->execute();
 		
 		$this->assertEquals(200, $response->status(), $response->body());
+		$this->assertEquals('application/json', $response->headers('Content-Type'));
+		
+		$configuration = json_decode($response->body(), TRUE);
+		
+		$this->assertArrayHasKey('Companies', $configuration);
 	}
 
 	public function testIndexWithTrailingSlash()
@@ -34,6 +39,7 @@ class RESTfulTest extends Unittest_TestCase {
 			->execute();
 		
 		$this->assertEquals(200, $response->status(), $response->body());
+		$this->assertEquals('application/json', $response->headers('Content-Type'));
 	}
 
 	/**
@@ -62,12 +68,16 @@ class RESTfulTest extends Unittest_TestCase {
 			->execute();
 		
 		$this->assertEquals(200, $response->status());
+		$this->assertEquals('application/json', $response->headers('Content-Type'));
 		
 		$companies = json_decode($response->body(), TRUE);
 		
 		$this->assertContains('test', Arr::pluck($companies, 'Name'), print_r(Arr::pluck($companies, 'Name'), TRUE));
 	}
 
+	/**
+	 * 
+	 */
 	public function testCompaniesUsingWrongApiKey()
 	{
 		$api_key = uniqid() . ':' . uniqid();
@@ -79,9 +89,26 @@ class RESTfulTest extends Unittest_TestCase {
 		$this->assertEquals(401, $response->status());
 		$this->assertEquals('Basic realm="Budj\'hète RESTful api"', $response->headers('WWW-Authenticate'));
 	}
+	
+	/**
+	 *
+	 */
+	public function testCompaniesUsingInvalidApiKey()
+	{
+		$api_key = uniqid() . ':';
+	
+		$response = Request::factory('http://localhost:8080/companies')
+			->headers('Authorization', 'Basic ' . base64_encode($api_key))
+			->execute();
+	
+		$this->assertEquals(401, $response->status());
+		$this->assertEquals('Basic realm="Budj\'hète RESTful api"', $response->headers('WWW-Authenticate'));
+	}
 
 	/**
 	 * Get software version, which is the api version.
+	 * 
+	 * GET /version
 	 */
 	public function testVersion()
 	{
@@ -92,6 +119,7 @@ class RESTfulTest extends Unittest_TestCase {
 			->execute();
 		
 		$this->assertEquals(200, $response->status());
+		$this->assertEquals('application/json', $response->headers('Content-Type'));
 		$this->assertJSONStringEqualsJSONString('"2.4"', $response->body());
 	}
 

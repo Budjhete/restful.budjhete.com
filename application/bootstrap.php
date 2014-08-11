@@ -1,19 +1,20 @@
-<?php defined('SYSPATH') or die('No direct script access.');
+<?php
+defined('SYSPATH') or die('No direct script access.');
 
 // -- Environment setup --------------------------------------------------------
 
 // Load the core Kohana class
-require SYSPATH.'classes/Kohana/Core'.EXT;
+require SYSPATH . 'classes/Kohana/Core' . EXT;
 
-if (is_file(APPPATH.'classes/Kohana'.EXT))
+if (is_file(APPPATH . 'classes/Kohana' . EXT))
 {
 	// Application extends the core
-	require APPPATH.'classes/Kohana'.EXT;
+	require APPPATH . 'classes/Kohana' . EXT;
 }
 else
 {
 	// Load empty core extension
-	require SYSPATH.'classes/Kohana'.EXT;
+	require SYSPATH . 'classes/Kohana' . EXT;
 }
 
 /**
@@ -46,7 +47,7 @@ spl_autoload_register(array('Kohana', 'auto_load'));
  *
  * It is recommended to not enable this unless absolutely necessary.
  */
-//spl_autoload_register(array('Kohana', 'auto_load_lowercase'));
+// spl_autoload_register(array('Kohana', 'auto_load_lowercase'));
 
 /**
  * Enable the Kohana auto-loader for unserialization.
@@ -77,14 +78,15 @@ if (isset($_SERVER['SERVER_PROTOCOL']))
 }
 
 /**
- * Set Kohana::$environment if a 'KOHANA_ENV' environment variable has been supplied.
+ * Set Kohana::$environment if a 'KOHANA_ENV' environment variable has been
+ * supplied.
  *
  * Note: If you supply an invalid environment name, a PHP warning will be thrown
  * saying "Couldn't find constant Kohana::<INVALID_ENV_NAME>"
  */
 if (isset($_SERVER['KOHANA_ENV']))
 {
-	Kohana::$environment = constant('Kohana::'.strtoupper($_SERVER['KOHANA_ENV']));
+	Kohana::$environment = constant('Kohana::' . strtoupper($_SERVER['KOHANA_ENV']));
 }
 
 /**
@@ -92,49 +94,78 @@ if (isset($_SERVER['KOHANA_ENV']))
  *
  * The following options are available:
  *
- * - string   base_url    path, and optionally domain, of your application   NULL
- * - string   index_file  name of your index file, usually "index.php"       index.php
- * - string   charset     internal character set used for input and output   utf-8
- * - string   cache_dir   set the internal cache directory                   APPPATH/cache
- * - integer  cache_life  lifetime, in seconds, of items cached              60
- * - boolean  errors      enable or disable error handling                   TRUE
- * - boolean  profile     enable or disable internal profiling               TRUE
- * - boolean  caching     enable or disable internal caching                 FALSE
- * - boolean  expose      set the X-Powered-By header                        FALSE
+ * - string base_url path, and optionally domain, of your application NULL
+ * - string index_file name of your index file, usually "index.php" index.php
+ * - string charset internal character set used for input and output utf-8
+ * - string cache_dir set the internal cache directory APPPATH/cache
+ * - integer cache_life lifetime, in seconds, of items cached 60
+ * - boolean errors enable or disable error handling TRUE
+ * - boolean profile enable or disable internal profiling TRUE
+ * - boolean caching enable or disable internal caching FALSE
+ * - boolean expose set the X-Powered-By header FALSE
  */
-Kohana::init();
-
-/**
- * Attach the file write to logging. Multiple writers are supported.
- */
-Kohana::$log->attach(new Log_File(APPPATH.'logs'));
-
-/**
- * Attach a file reader to config. Multiple readers are supported.
- */
-Kohana::$config->attach(new Config_File);
-
-/**
- * Enable modules. Modules are referenced by a relative or absolute path.
- */
-Kohana::modules(array(
-	// 'auth'       => MODPATH.'auth',       // Basic authentication
-	// 'cache'      => MODPATH.'cache',      // Caching with multiple backends
-	// 'codebench'  => MODPATH.'codebench',  // Benchmarking tool
-	// 'database'   => MODPATH.'database',   // Database access
-	// 'image'      => MODPATH.'image',      // Image manipulation
-	// 'minion'     => MODPATH.'minion',     // CLI Tasks
-	// 'orm'        => MODPATH.'orm',        // Object Relationship Mapping
-	'unittest'   => MODPATH.'unittest',   // Unit testing
-	// 'userguide'  => MODPATH.'userguide',  // User guide and API documentation
+Kohana::init(array(
+	'base_url' => '/~guillaume/restful.budjhete.com/',
+	'index_file' => FALSE
 ));
 
-Route::set('restful', '<protocol>://<host>:<port>/company/<company>/<model>', array(
-	'company' => '\w+',
-	'model' => '\w+'
+/**
+ * Attach the file write to logging.
+ * Multiple writers are supported.
+ */
+Kohana::$log->attach(new Log_File(APPPATH . 'logs'));
+
+/**
+ * Attach a file reader to config.
+ * Multiple readers are supported.
+ */
+Kohana::$config->attach(new Config_File());
+
+Cookie::$salt = 'asdoqiue8qowiee8923749836';
+
+/**
+ * Enable modules.
+ * Modules are referenced by a relative or absolute path.
+ */
+Kohana::modules(array(
+	// 'auth' => MODPATH.'auth', // Basic authentication
+	// 'cache' => MODPATH.'cache', // Caching with multiple backends
+	// 'codebench' => MODPATH.'codebench', // Benchmarking tool
+	// 'database' => MODPATH.'database', // Database access
+	// 'image' => MODPATH.'image', // Image manipulation
+	// 'minion' => MODPATH.'minion', // CLI Tasks
+	// 'orm' => MODPATH.'orm', // Object Relationship Mapping
+	// 'userguide' => MODPATH.'userguide', // User guide and API documentation
+	'unittest' => MODPATH . 'unittest'
+)); // Unit testing
+
+/**
+ *
+ */
+Route::set('default', '', array(
+	'model' => '\w+',
+	'id' => '\d+',
+	'action' => '\w+'
 ))->defaults(array(
-	'protocol' => Kohana::$config->load('restful.protocol'),
-	'host' => Kohana::$config->load('restful.host'),
-	'port' => Kohana::$config->load('restful.port'),
+	'controller' => 'Company'	
+));
+
+/**
+ * 
+ */
+Route::set('model', '/<controller>(/<id>)(/<action>)', array(
+	'model' => '\w+', 
+	'id' => '\d+', 
+	'action' => '\w+'
+));
+
+/**
+ */
+Route::set('restful', '<protocol>://<host>:<port>/company/<company>/<model>', array(
+	'company' => '\w+', 'model' => '\w+'
+))->defaults(array(
+	'protocol' => Kohana::$config->load('restful.protocol'), 
+	'host' => Kohana::$config->load('restful.host'), 
+	'port' => Kohana::$config->load('restful.port'), 
 	'company' => Session::instance()->get('company')
 ));
