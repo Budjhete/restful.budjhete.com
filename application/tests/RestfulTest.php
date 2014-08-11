@@ -12,7 +12,29 @@ defined('SYSPATH') or die('No direct script access.');
  * @author Guillaume Poirier-Morency <guillaumepoiriermorency@gmail.com>
  * @copyright (c) 2014, Budj'hète Inc.
  */
-class BudjheteRESTfulTest extends Unittest_TestCase {
+class RESTfulTest extends Unittest_TestCase {
+
+	public function testIndex()
+	{
+		$api_key = Kohana::$config->load('restful.api_key');
+		
+		$response = Request::factory('http://localhost:8080')
+			->headers('Authorization', 'Basic ' . base64_encode($api_key))
+			->execute();
+		
+		$this->assertEquals(200, $response->status(), $response->body());
+	}
+
+	public function testIndexWithTrailingSlash()
+	{
+		$api_key = Kohana::$config->load('restful.api_key');
+		
+		$response = Request::factory('http://localhost:8080/')
+			->headers('Authorization', 'Basic ' . base64_encode($api_key))
+			->execute();
+		
+		$this->assertEquals(200, $response->status(), $response->body());
+	}
 
 	/**
 	 * List available companies
@@ -33,26 +55,26 @@ class BudjheteRESTfulTest extends Unittest_TestCase {
 	 */
 	public function testCompanies()
 	{
-		$api_key = Kohana::$config->load('budjhete.api_key');
+		$api_key = Kohana::$config->load('restful.api_key');
 		
-		$response = Request::factory('http://localhost:8080/companies')->headers('Authorization', 'Basic ' . base64_encode($api_key))
+		$response = Request::factory('http://localhost:8080/companies')
+			->headers('Authorization', 'Basic ' . base64_encode($api_key))
 			->execute();
 		
 		$this->assertEquals(200, $response->status());
 		
 		$companies = json_decode($response->body(), TRUE);
 		
-		$this->assertArrayHasKey('test', $companies, print_r($companies, TRUE));
-		
-		$this->assertJSONStringEqualsJSONString('["test"]', $response->body());
+		$this->assertContains('test', Arr::pluck($companies, 'Name'), print_r(Arr::pluck($companies, 'Name'), TRUE));
 	}
 
 	public function testCompaniesUsingWrongApiKey()
 	{
 		$api_key = uniqid() . ':' . uniqid();
-
-		$response = Request::factory('http://localhost:8080/companies')->headers('Authorization', 'Basic ' . base64_encode($api_key))
-		->execute();
+		
+		$response = Request::factory('http://localhost:8080/companies')
+			->headers('Authorization', 'Basic ' . base64_encode($api_key))
+			->execute();
 		
 		$this->assertEquals(401, $response->status());
 		$this->assertEquals('Basic realm="Budj\'hète RESTful api"', $response->headers('WWW-Authenticate'));
@@ -63,13 +85,14 @@ class BudjheteRESTfulTest extends Unittest_TestCase {
 	 */
 	public function testVersion()
 	{
-		$api_key = Kohana::$config->load('budjhete.api_key');
+		$api_key = Kohana::$config->load('restful.api_key');
 		
-		$response = Request::factory('http://localhost:8080/version')->headers('Authorization', 'Basic ' . base64_encode($api_key))
+		$response = Request::factory('http://localhost:8080/version')
+			->headers('Authorization', 'Basic ' . base64_encode($api_key))
 			->execute();
 		
 		$this->assertEquals(200, $response->status());
-		$this->assertJSONStringEqualsJSONString('["2.4"]', $response->body());
+		$this->assertJSONStringEqualsJSONString('"2.4"', $response->body());
 	}
 
 	/**
@@ -95,12 +118,15 @@ class BudjheteRESTfulTest extends Unittest_TestCase {
 	 */
 	public function testCompany()
 	{
-		$response = Request::factory('http://localhost:8080/company/test')->headers('Authorization', 'Basic ' . base64_encode('test:test'))
+		$response = Request::factory('http://localhost:8080/company/test')
+			->headers('Authorization', 'Basic ' . base64_encode('test:test'))
 			->execute();
 		
 		$this->assertEquals(200, $response->status());
 		$this->assertEquals('application/json', $response->headers('Content-Type'));
 		
-		$this->assertJSONStringEqualsJSONString('', $response->body());
+		$company = json_decode($response->body(), TRUE);
+		
+		$this->assertArrayHasKey('Nom', $company, $response->body());
 	}
 }

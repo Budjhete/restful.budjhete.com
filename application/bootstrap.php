@@ -128,3 +128,13 @@ Kohana::modules(array(
 	'unittest'   => MODPATH.'unittest',   // Unit testing
 	// 'userguide'  => MODPATH.'userguide',  // User guide and API documentation
 ));
+
+Route::set('restful', '<protocol>://<host>:<port>/company/<company>/<model>', array(
+	'company' => '\w+',
+	'model' => '\w+'
+))->defaults(array(
+	'protocol' => Kohana::$config->load('restful.protocol'),
+	'host' => Kohana::$config->load('restful.host'),
+	'port' => Kohana::$config->load('restful.port'),
+	'company' => Session::instance()->get('company')
+));
