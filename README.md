@@ -10,49 +10,6 @@ documentation for the api.
 
 The api is solely using the [JSON](http://json.org) data format.
 
-## Authentication
-
-There are two distinct authentification enabled on the api. You can authenticate
-either with a registered user in the database or using an api key found in the
-program configuration.
-
-Using an api key, you may access a list of registered companies and details on
-each of these companies.
-
-Using a registered user, you have access to clients, products, invoices and so
-on, just like you would do if you would login to your business.
-
-Basic and Digest HTTP authentication is used for both of these authentications.
-
-At first, if not authenticated, the api will respond you with a ```401``` status
-code and will provide the appropriate header ```WWW-Authenticate```
-
-```http
-GET /
-WWW-Authenticate: Basic ...
-```
-
-Any request done to the api must provide the ```Authorization``` header. It may
-either be Basic or Digest.
-
-In case of a Basic authentication, 
-
-```http
-GET /
-Authorization: Basic base64(username + ':' + password)
-Authorization: Basic base64(api_key)
-```
-
-In case of a Digest authentication
-
-```http
-GET /
-Authorization: Basic base64(username + ':' + md5(password))
-Authorization: Basic base64(md5(api_key))
-```
-
-These headers must be systematically providen in order to access the api.
-
 ## Accessing the api
 
 ### Using the api key
